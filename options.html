@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Antigravity Bridge — Configurações</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0d1117; color:#e6edf3;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { background:#161b22; border:1px solid #30363d; border-radius:12px;
+    padding:28px; max-width:560px; width:100%; }
+  .logo-row { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+  .logo { width:40px;height:40px; background:linear-gradient(135deg,#7c3aed,#3b82f6);
+    border-radius:10px; display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:bold;color:#fff; }
+  h1 { font-size:18px; font-weight:700; }
+  .sub { font-size:12px; color:#6e7681; margin-top:2px; }
+  .section { margin-bottom:20px; }
+  .section h2 { font-size:12px; font-weight:600; color:#7c3aed; text-transform:uppercase;
+    letter-spacing:.05em; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #21262d; }
+  label { display:block; font-size:12px; color:#8b949e; margin-bottom:4px; }
+  input, select { width:100%; background:#0d1117; border:1px solid #30363d; color:#e6edf3;
+    border-radius:6px; padding:8px 10px; font-size:12px; outline:none; margin-bottom:10px;
+    font-family:inherit; transition:border-color .2s; }
+  input:focus, select:focus { border-color:#7c3aed; }
+  input[type=password] { letter-spacing:.1em; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer;
+    font-size:13px; font-weight:600; transition:opacity .2s; }
+  .btn-primary { background:linear-gradient(135deg,#7c3aed,#3b82f6); color:#fff; }
+  .btn-secondary { background:#21262d; color:#c9d1d9; }
+  .btn:hover { opacity:.85; }
+  .btn-row { display:flex; gap:8px; margin-top:6px; }
+  .status { padding:10px 12px; border-radius:8px; font-size:12px; margin-top:12px;
+    border:1px solid #30363d; display:none; }
+  .status.ok  { border-color:#3fb950; background:#0a1a0e; color:#3fb950; }
+  .status.err { border-color:#f85149; background:#1a0a0a; color:#f85149; }
+  .status.info { border-color:#3b82f6; background:#0a1020; color:#3b82f6; }
+  .tip { font-size:10px; color:#6e7681; margin-top:-6px; margin-bottom:10px; }
+  .sync-bar { background:#0d1117; border:1px solid #21262d; border-radius:8px;
+    padding:10px 12px; font-size:11px; display:flex; align-items:center; gap:8px; }
+  .dot { width:8px;height:8px;border-radius:50%; flex-shrink:0; }
+  .dot.green  { background:#3fb950; }
+  .dot.red    { background:#f85149; }
+  .dot.yellow { background:#d29922; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="logo">AG</div>
+    <div>
+      <h1>Antigravity Bridge</h1>
+      <div class="sub">Configuração de Sincronização Soberana — v2.0</div>
+    </div>
+  </div>
+
+  <!-- GitHub Backend -->
+  <div class="section">
+    <h2>🔑 GitHub — Backend de Conhecimento</h2>
+    <p style="font-size:11px;color:#6e7681;margin-bottom:12px">
+      O GitHub atua como backend portável: seus KIs ficam num repo privado acessível de <strong>qualquer computador</strong>
+      com a extensão instalada. Crie um PAT em <a href="https://github.com/settings/tokens" target="_blank"
+      style="color:#3b82f6">github.com/settings/tokens</a> com escopo <code>repo</code>.
+    </p>
+    <label for="gh_token">Personal Access Token (PAT)</label>
+    <input type="password" id="gh_token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <label for="gh_owner">Seu usuário GitHub</label>
+    <input type="text" id="gh_owner" placeholder="seu_usuario_github">
+    <label for="gh_repo">Nome do repositório (será criado se não existir)</label>
+    <input type="text" id="gh_repo" value="cerebro-bridge">
+  </div>
+
+  <!-- Sync Status -->
+  <div class="section">
+    <h2>📡 Status de Conexão</h2>
+    <div class="sync-bar">
+      <div class="dot" id="ghDot" style="background:#d29922"></div>
+      <span id="ghStatus">GitHub: não verificado</span>
+    </div>
+    <div style="height:8px"></div>
+    <div class="sync-bar">
+      <div class="dot" id="localDot" style="background:#d29922"></div>
+      <span id="localStatus">Bridge local (7432): verificando...</span>
+    </div>
+  </div>
+
+  <!-- Antigravity IDE URL -->
+  <div class="section">
+    <h2>🚀 URL do Antigravity IDE</h2>
+    <label for="bridge_url">URL para abrir quando clicar em "Abrir IDE"</label>
+    <input type="text" id="bridge_url" placeholder="https://aistudio.google.com/ ou localhost">
+    <div class="tip">Deixe em branco para usar Google AI Studio. Para Antigravity IDE local, use a URL do servidor.</div>
+  </div>
+
+  <!-- Botões -->
+  <div class="btn-row">
+    <button class="btn btn-primary" id="saveBtn">💾 Salvar & Verificar</button>
+    <button class="btn btn-secondary" id="testGHBtn">🔍 Testar GitHub</button>
+    <button class="btn btn-secondary" id="createRepoBtn">📦 Criar Repo</button>
+  </div>
+  <div class="status" id="statusBox"></div>
+
+  <!-- Instrucoes PowerShell -->
+  <div class="section" style="margin-top:20px">
+    <h2>⚡ Sincronização via PowerShell (Home PC)</h2>
+    <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:10px;font-family:monospace;font-size:10px;color:#8b949e;line-height:1.6">
+      # Setup inicial (uma vez):<br>
+      . "D:\Cerebro_Virtual\modulo_github_cerebro_sync.ps1"<br>
+      Invoke-GitHubCerebroSync -Setup<br><br>
+      # Sync automático (todos os KIs):<br>
+      pwsh "$env:OneDrive\Sync_Cerebro_Global.ps1" -ModoAntigravityBridge -PushAll<br><br>
+      # Iniciar bridge server local:<br>
+      pwsh "D:\Cerebro_Virtual\bridge_server.ps1"
+    </div>
+  </div>
+</div>
+
+<script>
+// Carregar configs salvas
+chrome.storage.sync.get(['gh_token','gh_owner','gh_repo','bridge_url'], cfg => {
+  if (cfg.gh_token)    document.getElementById('gh_token').value    = cfg.gh_token;
+  if (cfg.gh_owner)    document.getElementById('gh_owner').value    = cfg.gh_owner;
+  if (cfg.gh_repo)     document.getElementById('gh_repo').value     = cfg.gh_repo;
+  if (cfg.bridge_url)  document.getElementById('bridge_url').value  = cfg.bridge_url;
+});
+
+function showStatus(msg, type='info') {
+  const b = document.getElementById('statusBox');
+  b.textContent = msg; b.className = `status ${type}`; b.style.display='block';
+}
+
+// Salvar
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const cfg = {
+    gh_token:   document.getElementById('gh_token').value.trim(),
+    gh_owner:   document.getElementById('gh_owner').value.trim(),
+    gh_repo:    document.getElementById('gh_repo').value.trim() || 'cerebro-bridge',
+    bridge_url: document.getElementById('bridge_url').value.trim()
+  };
+  await chrome.storage.sync.set(cfg);
+  showStatus('✅ Configurações salvas e sincronizadas com todos os seus Chromes!', 'ok');
+  testGitHub(cfg);
+});
+
+// Testar GitHub
+async function testGitHub(cfg) {
+  if (!cfg) {
+    const data = await chrome.storage.sync.get(['gh_token','gh_owner','gh_repo']);
+    cfg = data;
+  }
+  if (!cfg.gh_token || !cfg.gh_owner) {
+    showStatus('⚠️ Preencha o PAT e o usuário GitHub antes de testar.', 'err');
+    document.getElementById('ghDot').className='dot red';
+    document.getElementById('ghStatus').textContent='GitHub: credenciais ausentes';
+    return;
+  }
+  try {
+    const r = await fetch(`https://api.github.com/repos/${cfg.gh_owner}/${cfg.gh_repo || 'cerebro-bridge'}`, {
+      headers: { 'Authorization': `Bearer ${cfg.gh_token}`, 'Accept': 'application/vnd.github.v3+json' },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (r.ok) {
+      const d = await r.json();
+      document.getElementById('ghDot').className='dot green';
+      document.getElementById('ghStatus').textContent=`GitHub: ✅ ${d.full_name} (${d.private?'privado':'publico'})`;
+      showStatus(`✅ Repo encontrado: ${d.html_url}`, 'ok');
+    } else if (r.status===404) {
+      document.getElementById('ghDot').className='dot yellow';
+      document.getElementById('ghStatus').textContent='GitHub: repo não encontrado (clique em Criar Repo)';
+      showStatus('⚠️ Repo não existe ainda. Clique em "Criar Repo".', 'info');
+    } else {
+      throw new Error(`HTTP ${r.status}`);
+    }
+  } catch(e) {
+    document.getElementById('ghDot').className='dot red';
+    document.getElementById('ghStatus').textContent=`GitHub: erro — ${e.message}`;
+    showStatus(`❌ Erro: ${e.message}`, 'err');
+  }
+}
+
+document.getElementById('testGHBtn').addEventListener('click', () => testGitHub(null));
+
+// Criar repo
+document.getElementById('createRepoBtn').addEventListener('click', async () => {
+  const { gh_token, gh_owner, gh_repo } = await chrome.storage.sync.get(['gh_token','gh_owner','gh_repo']);
+  if (!gh_token || !gh_owner) { showStatus('Salve as credenciais primeiro.', 'err'); return; }
+  try {
+    const r = await fetch('https://api.github.com/user/repos', {
+      method: 'POST',
+      headers: { 'Authorization':`Bearer ${gh_token}`, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' },
+      body: JSON.stringify({ name: gh_repo || 'cerebro-bridge', private: true, auto_init: true,
+        description: 'Antigravity Bridge - Cerebro Virtual Knowledge Sync' })
+    });
+    if (r.ok) { showStatus('✅ Repo criado! Execute -Setup no PowerShell para fazer o primeiro sync.', 'ok'); }
+    else { const e = await r.json(); showStatus(`❌ ${e.message}`, 'err'); }
+  } catch(e) { showStatus(`❌ ${e.message}`, 'err'); }
+});
+
+// Status bridge local
+fetch('http://localhost:7432/health', { signal: AbortSignal.timeout(1500) })
+  .then(r => r.json()).then(() => {
+    document.getElementById('localDot').className='dot green';
+    document.getElementById('localStatus').textContent='Bridge local (7432): ✅ online';
+  }).catch(() => {
+    document.getElementById('localDot').className='dot red';
+    document.getElementById('localStatus').textContent='Bridge local (7432): offline (opcional)';
+  });
+
+// Auto-testar ao carregar se config existir
+chrome.storage.sync.get(['gh_token'], d => { if (d.gh_token) testGitHub(null); });
+</script>
+</body>
+</html>

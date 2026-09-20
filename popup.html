@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { width:260px; font-family:'Segoe UI',sans-serif;
+    background:#0d1117; color:#e6edf3; padding:12px; }
+  h2 { font-size:12px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+  .logo { width:20px;height:20px; background:linear-gradient(135deg,#7c3aed,#3b82f6);
+    border-radius:4px; display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:bold;color:#fff; }
+  .btn { width:100%; padding:7px; margin-bottom:5px; border:none; border-radius:6px;
+    cursor:pointer; font-size:11px; font-weight:600; transition:opacity .2s; text-align:left; padding-left:10px; }
+  .btn:hover { opacity:.85; }
+  .btn-primary { background:linear-gradient(135deg,#7c3aed,#3b82f6); color:white; }
+  .btn-secondary { background:#21262d; color:#c9d1d9; }
+  .status { font-size:9px; color:#6e7681; text-align:center; margin-top:6px;
+    padding:4px; border:1px solid #21262d; border-radius:4px; }
+  .ver { font-size:9px; color:#30363d; text-align:right; margin-top:4px; }
+</style>
+</head>
+<body>
+<h2><div class="logo">AG</div> Antigravity Bridge</h2>
+<button class="btn btn-primary" id="openSidebar">📌 Abrir Sidebar</button>
+<button class="btn btn-secondary" id="openWA">💬 WhatsApp Web</button>
+<button class="btn btn-secondary" id="openIDE">🚀 Antigravity IDE</button>
+<button class="btn btn-secondary" id="openOpts">⚙️ Configurar GitHub Sync</button>
+<div class="status" id="status">Verificando conexão...</div>
+<div class="ver">v2.0 — GitHub + chrome.storage.sync</div>
+<script>
+document.getElementById('openSidebar').onclick = async () => {
+  const [tab] = await chrome.tabs.query({ active:true, currentWindow:true });
+  await chrome.sidePanel.open({ windowId:tab.windowId }); window.close();
+};
+document.getElementById('openWA').onclick = () => { chrome.runtime.sendMessage({ type:'OPEN_WHATSAPP' }); window.close(); };
+document.getElementById('openIDE').onclick = () => { chrome.runtime.sendMessage({ type:'OPEN_ANTIGRAVITY' }); window.close(); };
+document.getElementById('openOpts').onclick = () => { chrome.runtime.openOptionsPage(); window.close(); };
+
+// Status
+chrome.storage.sync.get(['gh_token','gh_owner','gh_repo'], ({ gh_token, gh_owner, gh_repo }) => {
+  if (!gh_token) {
+    document.getElementById('status').textContent = '⚠️ GitHub não configurado — clique em Configurar';
+    document.getElementById('status').style.borderColor='#d29922'; return;
+  }
+  fetch(`https://api.github.com/repos/${gh_owner}/${gh_repo||'cerebro-bridge'}`, {
+    headers:{ Authorization:`Bearer ${gh_token}`, Accept:'application/vnd.github.v3+json' },
+    signal: AbortSignal.timeout(2000)
+  }).then(r => {
+    document.getElementById('status').textContent = r.ok ? `✅ ${gh_owner}/${gh_repo||'cerebro-bridge'}` : '❌ Repo não encontrado';
+    document.getElementById('status').style.borderColor = r.ok ? '#3fb950' : '#f85149';
+  }).catch(() => {
+    document.getElementById('status').textContent = '📡 Sem conexão com GitHub';
+  });
+});
+</script>
+</body>
+</html>
